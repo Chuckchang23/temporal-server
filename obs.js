@@ -29,7 +29,7 @@ async function hideSoleilInScene3() {
 
   // 1️⃣ Get scene item ID for "SOLEIL" in "Scene 3"
   const { sceneItems } = await obs.call("GetSceneItemList", {
-    sceneName: "Scene 3",
+    sceneName: "Scene 2",
   });
 
   const soleil = sceneItems.find(i => i.sourceName === "SOLEIL");
@@ -37,7 +37,7 @@ async function hideSoleilInScene3() {
 
   // 2️⃣ Toggle visibility OFF
   await obs.call("SetSceneItemEnabled", {
-    sceneName: "Scene 3",
+    sceneName: "Scene 2",
     sceneItemId: soleil.sceneItemId,
     sceneItemEnabled: !soleil.sceneItemEnabled,
   });
@@ -46,7 +46,7 @@ async function hideSoleilInScene3() {
   // 🔥 PUSH Preview → Program
   await obs.call("TriggerStudioModeTransition");
   
-  console.log("🎬 SOLEIL hidden in Scene 3");
+  console.log("🎬 SOLEIL hidden in Scene 2");
 }
 
 module.exports = {
