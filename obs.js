@@ -26,7 +26,7 @@ async function connectOBS() {
 
 async function hideSoleilInScene3() {
   await connectOBS();
-
+  
   // 1️⃣ Get scene item ID for "SOLEIL" in "Scene 3"
   const { sceneItems } = await obs.call("GetSceneItemList", {
     sceneName: "Scene 2",
@@ -41,12 +41,14 @@ async function hideSoleilInScene3() {
     sceneItemId: soleil.sceneItemId,
     sceneItemEnabled: !soleil.sceneItemEnabled,
   });
-
+  sceneName = soleil.sceneItemEnabled == true ? "Scene 2" : "Scene";
 
   // 🔥 PUSH Preview → Program
   await obs.call("TriggerStudioModeTransition");
   
   console.log("🎬 SOLEIL hidden in Scene 2");
+  await obs.call("SetCurrentProgramScene", { sceneName });
+  return true;
 }
 
 module.exports = {
