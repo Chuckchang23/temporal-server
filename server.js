@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
@@ -14,9 +15,9 @@ const db = new Database("game.db");
 // =========================
 // OBS WebSocket CONFIG
 // =========================
-const OBS_IP = process.env.OBS_IP || "192.168.68.116";
+const OBS_IP = process.env.OBS_IP;
 const OBS_PORT = parseInt(process.env.OBS_PORT || "4455", 10);
-const OBS_PASSWORD = process.env.OBS_PASSWORD || "6cfFyyzyp8R6m5f7";
+const OBS_PASSWORD = process.env.OBS_PASSWORD;
 const OBS_SCENE_2_NAME = process.env.OBS_SCENE_2_NAME || "Scene 2";
 const { hideSoleilInScene3 } = require("./obs");
 const obs = new OBSWebSocket();
