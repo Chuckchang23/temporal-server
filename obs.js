@@ -1,0 +1,53 @@
+const OBSWebSocket = require("obs-websocket-js").default;
+
+const obs = new OBSWebSocket();
+
+let connected = false;
+const OBS_IP = process.env.OBS_IP || "192.168.68.116";
+const OBS_PORT = parseInt(process.env.OBS_PORT || "4455", 10);
+const OBS_PASSWORD = process.env.OBS_PASSWORD || "6cfFyyzyp8R6m5f7";
+
+
+async function connectOBS() {
+  if (connected) return;
+
+  try {
+    await obs.connect(
+      "ws://127.0.0.1:4455",   // OBS machine IP
+      process.env.OBS_PASSWORD || "6cfFyyzyp8R6m5f7"
+    );
+    connected = true;
+    console.log("✅ Connected to OBS");
+  } catch (e) {
+    console.error("❌ OBS connection failed:", e.message);
+  }
+}
+
+async function hideSoleilInScene3() {
+  await connectOBS();
+
+  // 1️⃣ Get scene item ID for "SOLEIL" in "Scene 3"
+  const { sceneItems } = await obs.call("GetSceneItemList", {
+    sceneName: "Scene 3",
+  });
+
+  const soleil = sceneItems.find(i => i.sourceName === "SOLEIL");
+  if (!soleil) throw new Error("SOLEIL source not found");
+
+  // 2️⃣ Toggle visibility OFF
+  await obs.call("SetSceneItemEnabled", {
+    sceneName: "Scene 3",
+    sceneItemId: soleil.sceneItemId,
+    sceneItemEnabled: !soleil.sceneItemEnabled,
+  });
+
+
+  // 🔥 PUSH Preview → Program
+  await obs.call("TriggerStudioModeTransition");
+  
+  console.log("🎬 SOLEIL hidden in Scene 3");
+}
+
+module.exports = {
+  hideSoleilInScene3,
+};
