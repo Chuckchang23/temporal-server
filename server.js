@@ -309,6 +309,68 @@ app.get("/sessions", (req, res) => {
   res.json({ sessions: rows });
 });
 
+// =========================
+// DIORAMA ESP32 PROXY
+// =========================
+const ESP32_HOST = process.env.ESP32_HOST || 'http://ttdiorama.local';
+
+const VALID_MODES = new Set(['watch', 'letter', 'compass', 'stop']);
+const VALID_AUX   = new Set(['botshelf', 'midshelf', 'up', 'down', 'stopaux']);
+
+function proxyToESP32(path, body) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(path, ESP32_HOST);
+    const postData = body;
+    const options = {
+      hostname: url.hostname,
+      port: url.port || 80,
+      path: url.pathname,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData),
+      },
+    };
+    const req = http.request(options, (res) => {
+      res.resume(); // drain the response body
+      resolve({ status: res.statusCode });
+    });
+    req.setTimeout(5000, () => {
+      req.destroy();
+      reject(new Error('ESP32 request timed out'));
+    });
+    req.on('error', reject);
+    req.write(postData);
+    req.end();
+  });
+}
+
+app.post('/diorama/mode', async (req, res) => {
+  const { artifact } = req.body || {};
+  if (!artifact || !VALID_MODES.has(artifact)) {
+    return res.status(400).json({ ok: false, error: `artifact must be one of: ${[...VALID_MODES].join(', ')}` });
+  }
+  try {
+    await proxyToESP32('/mode', `artifact=${artifact}`);
+    res.json({ ok: true, artifact });
+  } catch (e) {
+    res.status(502).json({ ok: false, error: e.message });
+  }
+});
+
+app.post('/diorama/aux', async (req, res) => {
+  const { action } = req.body || {};
+  if (!action || !VALID_AUX.has(action)) {
+    return res.status(400).json({ ok: false, error: `action must be one of: ${[...VALID_AUX].join(', ')}` });
+  }
+  try {
+    await proxyToESP32('/aux', `action=${action}`);
+    res.json({ ok: true, action });
+  } catch (e) {
+    res.status(502).json({ ok: false, error: e.message });
+  }
+});
+
 server.listen(3000, "0.0.0.0", () => {
   console.log("Game Brain running on http://0.0.0.0:3000");
   console.log("WS: ws://<server-ip>:3000/ws?sessionId=<id>&device=<pr|pa|f|rpi>");
