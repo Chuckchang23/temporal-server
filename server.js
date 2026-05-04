@@ -580,8 +580,6 @@ app.get("/sessions/:id/minecraftmap", (req, res) => {
 // =========================
 // START SERVER
 // =========================
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Game Brain running on http://0.0.0.0:${PORT}`);
-  console.log(`WS: ws://<server-ip>:${PORT}/ws?sessionId=<id>&device=<pr|pa|f|rpi>`);
-  console.log(`OBS action: POST http://<server-ip>:${PORT}/obs/action { type, payload }`);
+app.listen(3000, "0.0.0.0", () => {
+  console.log("Server running on port 3000");
 });
