@@ -18,6 +18,8 @@ const SCENES = {
   minecraft: "2 - Minecraft Room",
   mirror: "3 - Mirror Wall",
   tron: "4 - Tron room",
+  congratulations: "5 - Congratulations",
+  failed: "6 - Failed",
   bgMusic: "Audio - BG Music",
   asteroid: "~~~~Asteroid Overlay-----",
   portalVideo: "~~~ns~~~ Portal Video",
